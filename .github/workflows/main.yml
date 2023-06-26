@@ -44,6 +44,11 @@ jobs:
         sudo apt install -y apptainer
         singularity version
 
+    - name: install tools
+      run: |
+        sudo apt install -y bwa bedtools 
+        sudo apt install -y fastqc
+
     - name: Set up Python 3.X
       uses: actions/setup-python@v2
       with:
@@ -51,7 +56,8 @@ jobs:
 
     - name: Install Versionix using pip
       run: |
-        pip install .[testing]
+        pip install .
+        pip install pytest pytest-cov coverage coveralls
 
     - name: Install Damona using pip
       run: |
@@ -60,18 +66,9 @@ jobs:
         damona
         echo " source ~/.config/damona/damona.sh" >> ~/.bashrc
 
-    - name: install some tools for testing
+    - name: testing
       run: |
-        damona create TEST
-        damona activate TEST
-        damona install bwa
-        damona install fastqc
-
         pytest --cov-report term --cov=versionix
-      env:
-        DAMONA_EXE: /usr/share/miniconda/bin/damona
-        DAMONA_PATH: /home/runner/.config/damona
-        DAMONA_SINGULARITY_OPTIONS: ""
 
     - name: coveralls
       run: |

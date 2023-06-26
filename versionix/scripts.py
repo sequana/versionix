@@ -21,10 +21,6 @@
 ###########################################################################
 """.. rubric:: Standalone application dedicated to Damona"""
 import click
-import time
-import sys
-import pathlib
-import os
 
 
 from versionix import version
@@ -35,8 +31,8 @@ __all__ = ["main"]
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
-@click.command()
 
+@click.command()
 @click.argument("standalone", required=True, type=click.STRING)
 @click.version_option(version)
 def main(**kwargs):
@@ -45,5 +41,4 @@ def main(**kwargs):
         versionix fastqc
 
     """
-
-    print(get_version(kwargs["standalone"])) # frmt=kwargs["format"]))
+    print(get_version(kwargs["standalone"]))

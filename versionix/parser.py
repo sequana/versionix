@@ -15,10 +15,22 @@ import subprocess
 import sys
 
 
-
 def parse_click():
-    """versionix, version 0.1.0"""
+    """one liner output
+
+    versionix, version 0.1.0
+
+    """
     raise NotImplementedError
+
+
+def parse_standalone_version_version(stdout: str):
+    """one liner output
+
+    singularity version 3.6.2+12-gad3457a9a
+
+    """
+    return stdout.strip().split()
 
 
 def parser_Version_column_version(stdout: str, *args):
@@ -35,32 +47,23 @@ def parser_Version_column_version(stdout: str, *args):
 def parser_standalone_version(stdout: str, standalone, *args):
     """
 
-    STANDALONE: 1.0.0
+    STANDALONE 1.0.0
 
     """
     for line in stdout.split("\n"):
         if line.startswith(f"{standalone}"):
             return line.strip().split()[1].strip()
 
-
 metadata = {
     "default": {"caller": "--version", "parser": None, "citation": "undefined"},
     "bwa": {"caller": "stderr", "parser": parser_Version_column_version, "citation": "undefined"},
-    "bamtools": {"caller": "--version", "parser": parser_standalone_version}
-    # "art_454":{
-    #    "caller": "stdout",
-    #    "parser":  parser_name_Version_version
-    # }
+    "seqtk": {"caller": "stderr", "parser": parser_Version_column_version, "citation": "undefined"},
+    "bamtools": {"caller": "--version", "parser": parser_standalone_version},
+    "singularity": {"caller": "version", "parser": None},
+    "bedtools": {"caller": "--version", "parser": parser_standalone_version}
 }
 
 
-def base_version_parser(stdout: str):
-    """{NAME}: v1.0.0"""
-    return stdout.split("\n", 1)[0].split()[-1]
-
-
-def seqtk_version_parser(stderr: str):
-    return stderr.strip().split("\n")[1].split()[-1]
 
 
 def get_version_method_long_argument(standalone):
@@ -72,10 +75,6 @@ def get_version_method_long_argument(standalone):
         return output
 
     except subprocess.CalledProcessError as e:
-        # --version flag not available, try other flags
-        # error_message = e.stderr.strip()
-        # if error_message:
-        #    return error_message
         pass
 
 
@@ -92,7 +91,7 @@ def get_version_method_short_argument(standalone):
 
 def get_version_method_subcommand(standalone):
 
-    # Try -v flag
+    # Try subcommand
     try:
         command = [standalone, "version"]
         output = subprocess.check_output(command, stderr=subprocess.PIPE, universal_newlines=True)
@@ -116,8 +115,9 @@ def get_version(standalone, debug=False):
 
     meta = metadata.get(standalone, metadata.get("default"))
 
+
     # Case when the standalone prints information on stderr
-    # e.g. bwa
+    # e.g. bwa, seqtk
     if meta["caller"] == "stderr":
         command = [standalone]
         try:
@@ -127,9 +127,28 @@ def get_version(standalone, debug=False):
         except subprocess.CalledProcessError as e:
             print(e)
             pass
+    elif meta['caller'] == 'version':
+        version = get_version_method_subcommand(standalone)
+        if meta["parser"]:
+            return meta["parser"](version)
+        elif version:
+            return version
+    elif meta['caller'] == '--version':
+        version = get_version_method_long_argument(standalone)
+        if meta["parser"]:
+            return meta["parser"](version, standalone)
+        elif version:
+            return version
+    elif meta['caller'] == 'standalone':
+        version = get_version_method_subcommand(standalone)
+        if meta["parser"]:
+            return meta["parser"](version)
+        elif version:
+            return version
 
+
+    #if caller is not define fallback on --version / -v / version cases
     # bamtools hides the --version and then prints somewhere: "bamtools 1.0.0"
-    #
     version = get_version_method_long_argument(standalone)
     if meta["parser"]:
         return meta["parser"](version, standalone)

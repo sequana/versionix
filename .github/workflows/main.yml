@@ -1,0 +1,86 @@
+name: Continuous Integration
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - '**.py'
+      - '.github/workflows/**'
+
+  pull_request:
+    branches-ignore: []
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-20.04
+    strategy:
+      max-parallel: 5
+      matrix:
+        python: [3.8, 3.9, '3.10']
+      fail-fast: false
+
+    steps:
+
+    - name: precleanup
+      run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
+    - uses: actions/checkout@v2
+    - uses: docker-practice/actions-setup-docker@master
+    - name: Test docker
+      run: |
+          set -x
+          docker version
+          docker run --rm hello-world
+
+    - name: install apptainer
+      run: |
+        sudo add-apt-repository -y ppa:apptainer/ppa
+        sudo apt update
+        sudo apt install -y apptainer
+        singularity version
+
+    - name: Set up Python 3.X
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Install Versionix using pip
+      run: |
+        pip install .[testing]
+
+    - name: Install Damona using pip
+      run: |
+        bash
+        pip install damona
+        damona
+        echo " source ~/.config/damona/damona.sh" >> ~/.bashrc
+
+    - name: install some tools for testing
+      run: |
+        damona create TEST
+        damona activate TEST
+        damona install bwa
+        damona install fastqc
+
+        pytest --cov-report term --cov=versionix
+      env:
+        DAMONA_EXE: /usr/share/miniconda/bin/damona
+        DAMONA_PATH: /home/runner/.config/damona
+        DAMONA_SINGULARITY_OPTIONS: ""
+
+    - name: coveralls
+      run: |
+        coveralls --service=github
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+
+
+
+
+
+

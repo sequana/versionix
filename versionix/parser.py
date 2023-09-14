@@ -55,15 +55,16 @@ def parser_standalone_version(stdout: str, standalone, *args):
             return line.strip().split()[1].strip()
 
 metadata = {
-    "default": {"caller": "--version", "parser": None, "citation": "undefined"},
     "bwa": {"caller": "stderr", "parser": parser_Version_column_version, "citation": "undefined"},
     "seqtk": {"caller": "stderr", "parser": parser_Version_column_version, "citation": "undefined"},
     "bamtools": {"caller": "--version", "parser": parser_standalone_version},
     "singularity": {"caller": "version", "parser": None},
-    "bedtools": {"caller": "--version", "parser": parser_standalone_version}
+    "bedtools": {"caller": "--version", "parser": parser_standalone_version},
+    "deeptools": {"caller": "--version", "parser": parser_standalone_version},
+    "salmon": {"caller": "--version", "parser": parser_standalone_version},
+    "gffread": {"caller": "--version", "parser": None},
+    "bamtools": {"caller": "--version", "parser": parser_standalone_version}
 }
-
-
 
 
 def get_version_method_long_argument(standalone):
@@ -73,7 +74,6 @@ def get_version_method_long_argument(standalone):
         command = [standalone, "--version"]
         output = subprocess.check_output(command, stderr=subprocess.PIPE, universal_newlines=True)
         return output
-
     except subprocess.CalledProcessError as e:
         pass
 
@@ -104,6 +104,7 @@ def get_version_method_subcommand(standalone):
 
 
 def get_version(standalone, debug=False):
+    """Main entry point that returns the version of an existing executable"""
     # we use check_output in case the standalone opens a GUI (e.g. fastqc --WRONG pops up the GUI)
 
     # Let us checl that the standalone exists
@@ -112,8 +113,11 @@ def get_version(standalone, debug=False):
         sys.exit(1)
 
     # Now, what kind of caller and parser do we need ?
-
-    meta = metadata.get(standalone, metadata.get("default"))
+    try:
+        meta = metadata[standalone]
+    except Exception as err:
+        print("# INFO Your input standalone is not registered. Please provide a PR or fill an issue")
+        sys.exit(1)
 
 
     # Case when the standalone prints information on stderr
@@ -145,27 +149,3 @@ def get_version(standalone, debug=False):
             return meta["parser"](version)
         elif version:
             return version
-
-
-    #if caller is not define fallback on --version / -v / version cases
-    # bamtools hides the --version and then prints somewhere: "bamtools 1.0.0"
-    version = get_version_method_long_argument(standalone)
-    if meta["parser"]:
-        return meta["parser"](version, standalone)
-    elif version:
-        return version
-
-    version = get_version_method_short_argument(standalone)
-    if meta["parser"]:
-        return meta["parser"](version)
-    elif version:
-        return version
-
-    version = get_version_method_subcommand(standalone)
-    if meta["parser"]:
-        return meta["parser"](version)
-    elif version:
-        return version
-
-    # If none of the flags work, return an error message
-    return "Unable to retrieve version information"

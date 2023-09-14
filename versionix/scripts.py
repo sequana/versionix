@@ -36,7 +36,7 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 @click.argument("standalone", required=True, type=click.STRING)
 @click.version_option(version)
 def main(**kwargs):
-    """Versionix returns the version of insalled software.
+    """Versionix returns the version of installed software.
 
         versionix fastqc
 

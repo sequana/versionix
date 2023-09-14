@@ -63,7 +63,10 @@ metadata = {
     "deeptools": {"caller": "--version", "parser": parser_standalone_version},
     "salmon": {"caller": "--version", "parser": parser_standalone_version},
     "gffread": {"caller": "--version", "parser": None},
-    "bamtools": {"caller": "--version", "parser": parser_standalone_version}
+    "cutadapt": {"caller": "--version", "parser": parser_standalone_version},
+    "bowtie2": {"caller": "--version", "parser": parser_standalone_version},
+    "bowtie": {"caller": "--version", "parser": parser_standalone_version},
+    "samtools": {"caller": "--version", "parser": parser_standalone_version}
 }
 
 

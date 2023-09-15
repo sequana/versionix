@@ -43,6 +43,26 @@ Then, just type e.g::
 
     versionix  fastqc
 
+DESCRIPTION
+===========
+
+
+The first difficulty is that standalone applications have different ways to obtain their version information. Some require the use of a long or short argument (--version or -v), while others do not require any argument at all. To handle these various cases, we define a set of **callers**. Similarly, the output of these applications can vary significantly, and we use **parsers** to parse the output. Here is a non-exhaustive list of callers:
+
+* None: Simply typing the command prints various information on stderr.
+* Short: Requires the use of the -v argument.
+* Long argument: Requires the use of the long --version argument.
+* Subcommand: Requires the use of the subcommand "version."
+
+Here is a non-exhaustive list of parsing methods:
+
+* parse_click: Extracts the version information from a Python package that depends on click (e.g., TOOL, version 1.0.0).
+* parse_standalone_version_version: Example output format (e.g., singularity version 3.6.2+12-gad3457a9a).
+* parser_Version_colum_version: Example output format (e.g., Version: v1.0.0).
+* parser_standalone_version: Example output format (e.g., TOOL 1.0.0).
+
+Versionix is designed to be used with all Sequana pipelines and is not intended to be universal. It will only work for tools that are registered. You can add your own standalone version in the versionix/versioniux.py file and provide a Pull Request.
+
 
 
 Changelog

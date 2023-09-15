@@ -14,141 +14,65 @@ import shutil
 import subprocess
 import sys
 
-
-def parse_click():
-    """one liner output
-
-    versionix, version 0.1.0
-
-    """
-    raise NotImplementedError
-
-
-def parse_standalone_version_version(stdout: str):
-    """one liner output
-
-    singularity version 3.6.2+12-gad3457a9a
-
-    """
-    return stdout.strip().split()
-
-
-def parser_Version_column_version(stdout: str, *args):
-    """
-
-    Version: v1.0.0
-
-    """
-    for line in stdout.split("\n"):
-        if line.startswith("Version:"):
-            return line.strip().split(":", 1)[1].strip()
-
-
-def parser_standalone_version(stdout: str, standalone, *args):
-    """
-
-    STANDALONE 1.0.0
-
-    """
-    for line in stdout.split("\n"):
-        if line.startswith(f"{standalone}"):
-            return line.strip().split()[1].strip()
-
 metadata = {
-    "bwa": {"caller": "stderr", "parser": parser_Version_column_version, "citation": "undefined"},
-    "seqtk": {"caller": "stderr", "parser": parser_Version_column_version, "citation": "undefined"},
-    "bamtools": {"caller": "--version", "parser": parser_standalone_version},
-    "singularity": {"caller": "version", "parser": None},
-    "bedtools": {"caller": "--version", "parser": parser_standalone_version},
-    "deeptools": {"caller": "--version", "parser": parser_standalone_version},
-    "salmon": {"caller": "--version", "parser": parser_standalone_version},
-    "gffread": {"caller": "--version", "parser": None},
-    "cutadapt": {"caller": "--version", "parser": parser_standalone_version},
-    "bowtie2": {"caller": "--version", "parser": parser_standalone_version},
-    "bowtie": {"caller": "--version", "parser": parser_standalone_version},
-    "samtools": {"caller": "--version", "parser": parser_standalone_version}
+    "apptainer": {"options": "version"},
+    "singularity": {"options": "version"},
+    "gffread": {"options": "--version"},
+    "STAR": {"options": "--version"},
+    "minimap2": {"options": "--version"},
+    "cutadapt": {"options": "--version"},
+    "bwa": {"parser": lambda x: x.stderr.strip().split("\n")[1].split()[1], "citation": "undefined"},
+    "seqtk": {"parser": lambda x: x.stderr.split("\n")[2].split()[1], "citation": "undefined"},
+    "featureCounts": {"parser": lambda x: x.stderr.split("\n")[1].split()[1], "citation": "undefined"},
+    "bamtools": {"options": "--version", "parser": lambda x: x.stdout.split()[1]},
+    "samtools": {"options": "--version", "parser": lambda x: x.stdout.split()[1]},
+    "snpEff": {"options": "-version", "parser": lambda x: x.stdout.split()[1]},
+    "deeptools": {"options": "--version", "parser": lambda x: x.stdout.split()[1]},
+    "salmon": {"options": "--version", "parser": lambda x: x.stdout.split()[1]},
+    "fastp": {"options": "--version", "parser": lambda x: x.stderr.split()[1]},
+    "bedtools": {"options": "--version", "parser": lambda x: x.stdout.split()[1][1:]},
+    "freebayes": {"options": "--version", "parser": lambda x: x.stdout.split()[1][1:]},
+    "fastqc": {"options": "--version", "parser": lambda x: x.stdout.split()[1][1:]},
+    "bowtie": {"options": "--version", "parser": lambda x: x.stdout.split()[2]},
+    "bowtie2": {"options": "--version", "parser": lambda x: x.stdout.split()[2]},
+    "multiqc": {"options": "--version", "parser": lambda x: x.stdout.split()[2]},
+    "kallisto": {"options": "version", "parser": lambda x: x.stdout.split()[2]},
+    "DESeq2": {
+        "caller": "Rscript -e \"library(DESeq2)\\npackageVersion('DESeq2')\"",
+        "parser": lambda x: x.stdout.split()[1].strip("’‘"),
+    },
 }
-
-
-def get_version_method_long_argument(standalone):
-
-    try:
-        # Try --version flag first
-        command = [standalone, "--version"]
-        output = subprocess.check_output(command, stderr=subprocess.PIPE, universal_newlines=True)
-        return output
-    except subprocess.CalledProcessError as e:
-        pass
-
-
-def get_version_method_short_argument(standalone):
-
-    # Try -v flag
-    try:
-        command = [standalone, "-v"]
-        output = subprocess.check_output(command, stderr=subprocess.PIPE, universal_newlines=True)
-        return output.strip()
-    except subprocess.CalledProcessError as e:
-        pass
-
-
-def get_version_method_subcommand(standalone):
-
-    # Try subcommand
-    try:
-        command = [standalone, "version"]
-        output = subprocess.check_output(command, stderr=subprocess.PIPE, universal_newlines=True)
-        return output.strip()
-    except subprocess.CalledProcessError as e:
-        pass
-
-
-# =========================================================================
 
 
 def get_version(standalone, debug=False):
     """Main entry point that returns the version of an existing executable"""
     # we use check_output in case the standalone opens a GUI (e.g. fastqc --WRONG pops up the GUI)
 
-    # Let us checl that the standalone exists
-    if shutil.which(standalone) is None:
-        print(f"ERROR: {standalone} command not found in your environment")
-        sys.exit(1)
-
-    # Now, what kind of caller and parser do we need ?
     try:
         meta = metadata[standalone]
     except Exception as err:
         print("# INFO Your input standalone is not registered. Please provide a PR or fill an issue")
         sys.exit(1)
 
+    # If there is not a special caller defined, let us check that the standalone exists
+    if "caller" not in meta.keys() and shutil.which(standalone) is None:
+        print(f"ERROR: {standalone} command not found in your environment")
+        sys.exit(1)
 
-    # Case when the standalone prints information on stderr
-    # e.g. bwa, seqtk
-    if meta["caller"] == "stderr":
-        command = [standalone]
-        try:
-            resp = subprocess.run([standalone], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    # The command used to get the version output
+    caller = meta.get("caller", standalone)
+    # The options necessary to get the version output
+    options = meta.get("options", "")
+    # The parser of the version output
+    parser = meta.get("parser", lambda x: x.stdout.strip())
 
-            return meta["parser"](resp.stderr, standalone)
-        except subprocess.CalledProcessError as e:
-            print(e)
-            pass
-    elif meta['caller'] == 'version':
-        version = get_version_method_subcommand(standalone)
-        if meta["parser"]:
-            return meta["parser"](version)
-        elif version:
-            return version
-    elif meta['caller'] == '--version':
-        version = get_version_method_long_argument(standalone)
-        if meta["parser"]:
-            return meta["parser"](version, standalone)
-        elif version:
-            return version
-    elif meta['caller'] == 'standalone':
-        version = get_version_method_subcommand(standalone)
-        if meta["parser"]:
-            return meta["parser"](version)
-        elif version:
-            return version
+    try:
+        cmd = f"{caller} {options}"
+
+        p = subprocess.run(cmd, capture_output=True, universal_newlines=True, shell=True)
+        version = parser(p)
+        return version
+
+    except Exception as err:
+        print(err)
+        sys.exit(1)

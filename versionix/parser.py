@@ -14,34 +14,7 @@ import shutil
 import subprocess
 import sys
 
-metadata = {
-    "apptainer": {"options": "version"},
-    "singularity": {"options": "version"},
-    "gffread": {"options": "--version"},
-    "STAR": {"options": "--version"},
-    "minimap2": {"options": "--version"},
-    "cutadapt": {"options": "--version"},
-    "bwa": {"parser": lambda x: x.stderr.strip().split("\n")[1].split()[1], "citation": "undefined"},
-    "seqtk": {"parser": lambda x: x.stderr.split("\n")[2].split()[1], "citation": "undefined"},
-    "featureCounts": {"parser": lambda x: x.stderr.split("\n")[1].split()[1], "citation": "undefined"},
-    "bamtools": {"options": "--version", "parser": lambda x: x.stdout.split()[1]},
-    "samtools": {"options": "--version", "parser": lambda x: x.stdout.split()[1]},
-    "snpEff": {"options": "-version", "parser": lambda x: x.stdout.split()[1]},
-    "deeptools": {"options": "--version", "parser": lambda x: x.stdout.split()[1]},
-    "salmon": {"options": "--version", "parser": lambda x: x.stdout.split()[1]},
-    "fastp": {"options": "--version", "parser": lambda x: x.stderr.split()[1]},
-    "bedtools": {"options": "--version", "parser": lambda x: x.stdout.split()[1][1:]},
-    "freebayes": {"options": "--version", "parser": lambda x: x.stdout.split()[1][1:]},
-    "fastqc": {"options": "--version", "parser": lambda x: x.stdout.split()[1][1:]},
-    "bowtie": {"options": "--version", "parser": lambda x: x.stdout.split()[2]},
-    "bowtie2": {"options": "--version", "parser": lambda x: x.stdout.split()[2]},
-    "multiqc": {"options": "--version", "parser": lambda x: x.stdout.split()[2]},
-    "kallisto": {"options": "version", "parser": lambda x: x.stdout.split()[2]},
-    "DESeq2": {
-        "caller": "Rscript -e \"library(DESeq2)\\npackageVersion('DESeq2')\"",
-        "parser": lambda x: x.stdout.split()[1].strip("’‘"),
-    },
-}
+from .registry import metadata
 
 
 def get_version(standalone, debug=False):
@@ -50,19 +23,23 @@ def get_version(standalone, debug=False):
 
     try:
         meta = metadata[standalone]
-    except Exception as err:
-        print("# INFO Your input standalone is not registered. Please provide a PR or fill an issue")
+    except KeyError:
+        print(
+            "# ERROR Your input standalone is not registered. Please provide a PR or fill an issue on github/sequana/versionix"
+        )
         sys.exit(1)
 
-    # If there is not a special caller defined, let us check that the standalone exists
+    # If there is no special caller defined, let us check that the standalone exists
     if "caller" not in meta.keys() and shutil.which(standalone) is None:
         print(f"ERROR: {standalone} command not found in your environment")
         sys.exit(1)
 
     # The command used to get the version output
     caller = meta.get("caller", standalone)
+
     # The options necessary to get the version output
     options = meta.get("options", "")
+
     # The parser of the version output
     parser = meta.get("parser", lambda x: x.stdout.strip())
 

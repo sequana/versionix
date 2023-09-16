@@ -57,7 +57,7 @@ jobs:
     - name: Install Versionix using pip
       run: |
         pip install .
-        pip install pytest pytest-cov coverage coveralls
+        pip install pytest pytest-cov coverage coveralls pytest-subprocess
 
     - name: Install Damona using pip
       run: |

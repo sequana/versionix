@@ -17,21 +17,23 @@ import sys
 from .registry import metadata
 
 
-def get_version(standalone, debug=False):
+def get_version(standalone, verbose=True):
     """Main entry point that returns the version of an existing executable"""
     # we use check_output in case the standalone opens a GUI (e.g. fastqc --WRONG pops up the GUI)
 
     try:
         meta = metadata[standalone]
     except KeyError:
-        print(
-            "# ERROR Your input standalone is not registered. Please provide a PR or fill an issue on github/sequana/versionix"
-        )
+        if verbose:
+            print(
+                "#ERROR Your input standalone is not registered. Please provide a PR or fill an issue on github/sequana/versionix"
+            )
         sys.exit(1)
 
     # If there is no special caller defined, let us check that the standalone exists
     if "caller" not in meta.keys() and shutil.which(standalone) is None:
-        print(f"ERROR: {standalone} command not found in your environment")
+        if verbose:
+            print(f"ERROR: {standalone} command not found in your environment")
         sys.exit(1)
 
     # The command used to get the version output

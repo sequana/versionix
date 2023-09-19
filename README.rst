@@ -16,9 +16,8 @@ Versionix
     :target: http://versionix.readthedocs.org/en/latest/?badge=latest
     :alt: Documentation Status
 
-.. image:: https://zenodo.org/badge/282275608.svg
-   :target: https://zenodo.org/badge/latestdoi/282275608
-
+.. image:: https://zenodo.org/badge/658721856.svg
+   :target: https://zenodo.org/badge/latestdoi/658721856
 
 :Python version: Python 3.8, 3.9, 3.10
 :Source: See  `http://github.com/sequana/versionix <https://github.com/sequana/versionix/>`__.

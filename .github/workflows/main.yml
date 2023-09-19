@@ -44,11 +44,6 @@ jobs:
         sudo apt install -y apptainer
         singularity version
 
-    - name: install tools
-      run: |
-        sudo apt install -y bwa bedtools 
-        sudo apt install -y fastqc
-
     - name: Set up Python 3.X
       uses: actions/setup-python@v2
       with:
@@ -57,7 +52,7 @@ jobs:
     - name: Install Versionix using pip
       run: |
         pip install .
-        pip install pytest pytest-cov coverage coveralls
+        pip install pytest pytest-cov coverage coveralls pytest-subprocess pytest-mock
 
     - name: Install Damona using pip
       run: |

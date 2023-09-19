@@ -38,7 +38,7 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 def main(**kwargs):
     """Versionix returns the version of installed software.
 
-        versionix fastqc
+    versionix fastqc
 
     """
     print(get_version(kwargs["standalone"]))

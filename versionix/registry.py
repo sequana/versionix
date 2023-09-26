@@ -28,6 +28,7 @@ metadata = {
     "featureCounts": {"parser": lambda x: x.stderr.split("\n")[1].split()[1], "citation": "undefined"},
     "freebayes": {"options": "--version", "parser": lambda x: x.stdout.split()[1][1:]},
     "gffread": {"options": "--version"},
+    "jellyfish": {"options": "--version", "parser": lambda x: x.stdout.split()[1]},
     "kallisto": {"options": "version", "parser": lambda x: x.stdout.split()[2]},
     "minimap2": {"options": "--version"},
     "multiqc": {"options": "--version", "parser": lambda x: x.stdout.split()[2]},

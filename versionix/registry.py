@@ -16,7 +16,7 @@ metadata = {
     "bedtools": {"options": "--version", "parser": lambda x: x.stdout.split()[1][1:]},
     "bowtie": {"options": "--version", "parser": lambda x: x.stdout.split()[2]},
     "bowtie2": {"options": "--version", "parser": lambda x: x.stdout.split()[2]},
-    "bwa": {"parser": lambda x: x.stderr.strip().split("\n")[1].split()[1], "citation": "undefined"},
+    "bwa": {"parser": lambda x: x.stderr.strip().split("\n")[1].split()[1]},
     "cutadapt": {"options": "--version"},
     "deeptools": {"options": "--version", "parser": lambda x: x.stdout.split()[1]},
     "DESeq2": {
@@ -30,8 +30,14 @@ metadata = {
     "gffread": {"options": "--version"},
     "jellyfish": {"options": "--version", "parser": lambda x: x.stdout.split()[1]},
     "kallisto": {"options": "version", "parser": lambda x: x.stdout.split()[2]},
+    "macs3": {
+        "options": "--version",
+        "parser": lambda x: x.stdout.split()[1],
+    },
     "minimap2": {"options": "--version"},
     "multiqc": {"options": "--version", "parser": lambda x: x.stdout.split()[2]},
+    "plotCorrelation": {"options": "--version", "parser": lambda x: x.stdout.split()[1]},
+    "plotFingerprint": {"options": "--version", "parser": lambda x: x.stdout.split()[1]},
     "salmon": {"options": "--version", "parser": lambda x: x.stdout.split()[1]},
     "samtools": {"options": "--version", "parser": lambda x: x.stdout.split()[1]},
     "seqtk": {"parser": lambda x: x.stderr.split("\n")[2].split()[1], "citation": "undefined"},

@@ -4,19 +4,25 @@ from versionix.scripts import main
 import sys
 
 # for testing we do not want to install all those tools/software so
-# we have set testing=True, in which case some sanity checks and 
+# we have set testing=True, in which case some sanity checks and
 # error won't be raised.
-#def get_version(standalone):
+# def get_version(standalone):
 #    return get_version_orig(standalone, testing=True)
 
+
+def test_macs3(fp, mocker):
+    fp.register(["macs3", "--version"], stdout=["macs3 3.0.0b1"])
+    assert get_version("macs3") == "3.0.0b1"
+
+
 def test_kallisto(fp, mocker):
-    mocker.patch('shutil.which', return_value="something")
+    # mocker.patch('shutil.which', return_value="something")
     fp.register(["kallisto", "version"], stdout=["kallisto, version 0.48.0"])
     assert get_version("kallisto") == "0.48.0"
 
 
 def _test_bwa(fp, mocker):
-    mocker.patch('shutil.which', return_value="something")
+    # mocker.patch('shutil.which', return_value="something")
     fp.register(
         ["bwa"],
         stderr=[
@@ -33,32 +39,33 @@ Usage:   bwa <command> [options]
 
 
 def test_bedtools(fp, mocker):
-    mocker.patch('shutil.which', return_value="something")
+    mocker.patch("shutil.which", return_value="something")
     fp.register(["bedtools", "--version"], stdout=["bedtools v2.30.0"])
     assert get_version("bedtools") == "2.30.0"
 
 
 def test_bamtools(fp, mocker):
-    mocker.patch('shutil.which', return_value="something")
+    mocker.patch("shutil.which", return_value="something")
     fp.register(["bamtools", "--version"], stdout=["bamtools 2.5.2"])
     assert get_version("bamtools") == "2.5.2"
 
 
 def test_singularity(fp, mocker):
-    mocker.patch('shutil.which', return_value="something")
+    mocker.patch("shutil.which", return_value="something")
     fp.register(["singularity", "version"], stdout=["3.6.2+12-gad3457a9a"])
     assert get_version("singularity") == "3.6.2+12-gad3457a9a"
 
 
 def test_script(fp, mocker):
     from click.testing import CliRunner
+
     runner = CliRunner()
 
     fp.register(["bedtools", "--version"], stdout=["bedtools v2.30.0"])
-    mocker.patch('shutil.which', return_value="bedtools")
+    mocker.patch("shutil.which", return_value="bedtools")
 
     result = runner.invoke(main, ["bedtools"])
-    print(result )
+    print(result)
 
 
 def test_bedtools_error():
@@ -68,6 +75,7 @@ def test_bedtools_error():
         assert False
     except SystemExit:
         assert True
+
 
 def test_no_standalone():
     try:

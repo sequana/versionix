@@ -52,6 +52,6 @@ def get_version(standalone, verbose=True):
         version = parser(p)
         return version
 
-    except Exception as err:
+    except Exception as err: #pragma: no cover
         print(err)
         sys.exit(1)

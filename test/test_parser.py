@@ -72,9 +72,10 @@ def test_script(fp, mocker):
     print(result)
 
 
-def test_bedtools_error():
+def test_bedtools_error(fp, mocker):
     # registered tool but if not installed, should raise a SystemExit error
     try:
+        mocker.patch("shutil.which", return_value=None)
         get_version("bedtools")
         assert False
     except SystemExit:

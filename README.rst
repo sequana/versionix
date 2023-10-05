@@ -48,7 +48,7 @@ DESCRIPTION
 
 The first difficulty is that standalone applications have different ways to obtain their version information. Some require the use of a long or short argument (--version or -v), while others do not require any argument at all. In addition, display channels (stdout or stderr) and formats of the version output differs between applications. To handle these various cases, we define a dictionnary of **metadata** related to the different standalones. These metadata helps in the identification of the command to run, the options to use, if the information is directed to stdout or stderr and the method to parse the output to obtain the version number.
 
-Versionix is designed to be used with all Sequana pipelines and is not intended to be universal. It will only work for tools that are registered. You can add your own standalone version in the versionix/versioniux.py file and provide a Pull Request.
+Versionix is designed to be used with all Sequana pipelines and is not intended to be universal. It will only work for tools that are registered. You can add your own standalone version in the versionix/register.py file and provide a Pull Request.
 
 Changelog
 =========
@@ -56,6 +56,7 @@ Changelog
 ========= ========================================================================
 Version   Description
 ========= ========================================================================
+0.2.1     More tools added.
 0.2       simplification. Add tests. Add more tools
 0.1       first draft
 ========= ========================================================================

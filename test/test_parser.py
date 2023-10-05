@@ -9,20 +9,24 @@ import sys
 # def get_version(standalone):
 #    return get_version_orig(standalone, testing=True)
 
+#The mocker which is set so that when we test the presence of e.G. macs3, which is not installed,
+#no error is raise
+
 
 def test_macs3(fp, mocker):
+    mocker.patch('shutil.which', return_value="something")
     fp.register(["macs3", "--version"], stdout=["macs3 3.0.0b1"])
     assert get_version("macs3") == "3.0.0b1"
 
 
 def test_kallisto(fp, mocker):
-    # mocker.patch('shutil.which', return_value="something")
+    mocker.patch('shutil.which', return_value="something")
     fp.register(["kallisto", "version"], stdout=["kallisto, version 0.48.0"])
     assert get_version("kallisto") == "0.48.0"
 
 
 def _test_bwa(fp, mocker):
-    # mocker.patch('shutil.which', return_value="something")
+    mocker.patch('shutil.which', return_value="something")
     fp.register(
         ["bwa"],
         stderr=[

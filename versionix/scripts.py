@@ -21,6 +21,7 @@
 ###########################################################################
 """.. rubric:: Standalone application dedicated to Damona"""
 import click
+import sys
 
 
 from versionix import version
@@ -33,12 +34,32 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 
 @click.command()
-@click.argument("standalone", required=True, type=click.STRING)
+@click.argument("standalone", required=False, type=click.STRING, default=None)
 @click.version_option(version)
+@click.option("--stats", is_flag=True, help="Prints number of registered tools")
+@click.option("--registered", is_flag=True, help="Prints the list of registered tools")
 def main(**kwargs):
     """Versionix returns the version of installed software.
 
-    versionix fastqc
+        versionix fastqc
+
+    You can check the list of registered tools as follows
+
+        versionix --registered
+
 
     """
-    print(get_version(kwargs["standalone"]))
+    if kwargs["stats"]:
+        from versionix.registry import metadata
+        click.echo(f"There are currently {len(metadata.keys())} registered tools in Versionix") 
+    elif kwargs["registered"]:
+        from versionix.registry import metadata
+        names = sorted(metadata.keys())
+        for name in names:
+            click.echo(f"{name}") 
+    else:
+        if kwargs["standalone"] is None:
+            click.echo("No standalone was provided. You must provide one. You can use --registered to see the current list'")
+            sys.exit(1)
+        else:
+            click.echo(get_version(kwargs["standalone"]))

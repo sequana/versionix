@@ -71,6 +71,9 @@ def test_script(fp, mocker):
     result = runner.invoke(main, ["bedtools"])
     print(result)
 
+    runner.invoke(main, ["--registered"])
+    runner.invoke(main, ["--stats"])
+    runner.invoke(main, )
 
 def test_bedtools_error(fp, mocker):
     # registered tool but if not installed, should raise a SystemExit error

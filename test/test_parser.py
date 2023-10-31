@@ -12,6 +12,11 @@ import sys
 #The mocker which is set so that when we test the presence of e.G. macs3, which is not installed,
 #no error is raise
 
+def test_sequana(fp, mocker):
+    mocker.patch('shutil.which', return_value="something")
+    fp.register(["sequana_coverage", "--version"], stdout=["v0.15.4"])
+    assert get_version("sequana_coverage") == "0.15.4"
+
 
 def test_macs3(fp, mocker):
     mocker.patch('shutil.which', return_value="something")
@@ -23,6 +28,20 @@ def test_kallisto(fp, mocker):
     mocker.patch('shutil.which', return_value="something")
     fp.register(["kallisto", "version"], stdout=["kallisto, version 0.48.0"])
     assert get_version("kallisto") == "0.48.0"
+
+
+def test_pigz(fp, mocker):
+    # stderr parser
+    mocker.patch('shutil.which', return_value="something")
+    fp.register(["pigz", "--version"], stderr=["pigz 2.4"])
+    assert get_version("pigz") == "2.4"
+
+
+def test_fastqc(fp, mocker):
+    # stderr parser
+    mocker.patch('shutil.which', return_value="something")
+    fp.register(["fastqc", "--version"], stderr=["fastqc v1.0.0"])
+    assert get_version("fastqc") == "1.0.0"
 
 
 def _test_bwa(fp, mocker):

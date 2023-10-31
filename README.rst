@@ -55,6 +55,7 @@ Changelog
 ========= ========================================================================
 Version   Description
 ========= ========================================================================
+0.2.2     add all tools required by sequana pipelines (oct 2023)
 0.2.1     More tools added.
 0.2       simplification. Add tests. Add more tools
 0.1       first draft

@@ -33,6 +33,9 @@ If you are in a hurry, just type::
 
 This is pure Python so no need for fancy libraries.
 
+Usage
+-----
+
 Then, just type e.g::
 
     versionix  fastqc
@@ -40,6 +43,15 @@ Then, just type e.g::
 This tool uses a registry so it will work only with resgistered tools, which list can be obtained with::
 
     versionix --registered
+
+Type::
+
+    versionix --help 
+
+to get more help like this example:
+
+.. image:: doc/versionix_usage.png
+
 
 DESCRIPTION
 ===========
@@ -55,6 +67,7 @@ Changelog
 ========= ========================================================================
 Version   Description
 ========= ========================================================================
+0.2.3     More tools in the registry
 0.2.2     add all tools required by sequana pipelines (oct 2023)
 0.2.1     More tools added.
 0.2       simplification. Add tests. Add more tools

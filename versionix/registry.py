@@ -227,11 +227,19 @@ metadata = {
     },
     "sequana": {
         "options": "--version",
-        "parser": parser_split_2_strip_v
+        "parser": parser_split_3
     },
     "sequana_coverage": {
         "options": "--version",
-        "parser": parser_strip_v
+        "parser": parser_split_3
+    },
+    "sequana_taxonomy": {
+        "options": "--version",
+        "parser": parser_split_3
+    },
+    "sequana_pipeotools": {
+        "options": "--version",
+        "parser": parser_split_3
     },
     "singularity": {
         "options": "version"

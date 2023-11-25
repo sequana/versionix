@@ -20,7 +20,7 @@
 # If not, see <http://www.gnu.org/licenses/>.                             #
 ###########################################################################
 """.. rubric:: Standalone application dedicated to Damona"""
-import click
+import rich_click as  click
 import sys
 
 
@@ -32,6 +32,12 @@ __all__ = ["main"]
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
+click.rich_click.USE_MARKDOWN = True
+click.rich_click.SHOW_METAVARS_COLUMN = True
+click.rich_click.APPEND_METAVARS_HELP = True
+click.rich_click.STYLE_ERRORS_SUGGESTION = "magenta italic"
+click.rich_click.SHOW_ARGUMENTS = True
+
 
 @click.command()
 @click.argument("standalone", required=False, type=click.STRING, default=None)
@@ -39,7 +45,9 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 @click.option("--stats", is_flag=True, help="Prints number of registered tools")
 @click.option("--registered", is_flag=True, help="Prints the list of registered tools")
 def main(**kwargs):
-    """Versionix returns the version of installed software.
+    """Versionix returns the version of bioinformatics software.
+
+    ----
 
         versionix fastqc
 

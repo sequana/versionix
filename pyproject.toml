@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "versionix"
-version = "0.2.2"
+version = "0.2.3"
 description = "Get version of any tools"
 authors = ["Sequana Team"]
 license = "BSD-3"
@@ -33,6 +33,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.8"
 click = "^8.1.7"
+rich-click = "^1.7.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.1"

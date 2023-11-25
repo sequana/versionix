@@ -14,7 +14,7 @@ import sys
 
 def test_sequana(fp, mocker):
     mocker.patch('shutil.which', return_value="something")
-    fp.register(["sequana_coverage", "--version"], stdout=["v0.15.4"])
+    fp.register(["sequana_coverage", "--version"], stdout=["sequana_coverage, version 0.15.4"])
     assert get_version("sequana_coverage") == "0.15.4"
 
 

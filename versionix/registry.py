@@ -121,6 +121,10 @@ metadata = {
         "options": "-v",
         "parser": lambda x: x.stderr.split("\n")[1].split()[1][1:], 
     },
+    "filter-abund.py": {
+        "options": "--version",
+        "parser": lambda x: [y.split()[1] for y in x.stderr.split("\n") if y.startswith("khmer")][0]
+    },
     "flye": {
         "options": "--version",
     },
@@ -159,6 +163,10 @@ metadata = {
         "options": "",
         "parser": lambda x: x.stdout.split("\n")[1].split()[2]
     },
+    "liftoff": {
+        "options": "--version",
+        "parser": parser_strip_v
+    },
     "macs3": {
         "options": "--version",
         "parser": parser_split_2,
@@ -173,6 +181,10 @@ metadata = {
     "multiqc": {
         "options": "--version",
         "parser": parser_split_3
+    },
+    "normalize-by-median.py": {
+        "options": "--version",
+        "parser": lambda x: [y.split()[1] for y in x.stderr.split("\n") if y.startswith("khmer")][0]   
     },
     "pbindex": {
         "options": "--version",
@@ -203,6 +215,10 @@ metadata = {
         "parser": parser_split_2_strip_v
     },
     "quast": {
+        "options": "",
+        "parser": lambda x: x.stderr.split("\n")[1].split()[1]
+    },
+    "quast.py": {
         "options": "",
         "parser": lambda x: x.stderr.split("\n")[1].split()[1]
     },
@@ -243,6 +259,14 @@ metadata = {
     },
     "singularity": {
         "options": "version"
+    },
+    "spades.py": {
+        "options": "--version",
+        "parser": parser_split_2_strip_v
+    },
+    "split-paired-reads.py": {
+        "options": "--version",
+        "parser": lambda x: [y.split()[1] for y in x.stderr.split("\n") if y.startswith("khmer")][0]
     },
     "STAR": {
         "options": "--version"

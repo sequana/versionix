@@ -20,13 +20,12 @@
 # If not, see <http://www.gnu.org/licenses/>.                             #
 ###########################################################################
 """.. rubric:: Standalone application dedicated to Damona"""
-import rich_click as  click
 import sys
 
+import rich_click as click
 
 from versionix import version
 from versionix.parser import get_version
-
 
 __all__ = ["main"]
 
@@ -59,15 +58,19 @@ def main(**kwargs):
     """
     if kwargs["stats"]:
         from versionix.registry import metadata
-        click.echo(f"There are currently {len(metadata.keys())} registered tools in Versionix") 
+
+        click.echo(f"There are currently {len(metadata.keys())} registered tools in Versionix")
     elif kwargs["registered"]:
         from versionix.registry import metadata
+
         names = sorted(metadata.keys())
         for name in names:
-            click.echo(f"{name}") 
+            click.echo(f"{name}")
     else:
         if kwargs["standalone"] is None:
-            click.echo("No standalone was provided. You must provide one. You can use --registered to see the current list'")
+            click.echo(
+                "No standalone was provided. You must provide one. You can use --registered to see the current list'"
+            )
             sys.exit(1)
         else:
             click.echo(get_version(kwargs["standalone"]))

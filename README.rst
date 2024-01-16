@@ -46,7 +46,7 @@ This tool uses a registry so it will work only with resgistered tools, which lis
 
 Type::
 
-    versionix --help 
+    versionix --help
 
 to get more help like this example:
 
@@ -67,6 +67,7 @@ Changelog
 ========= ========================================================================
 Version   Description
 ========= ========================================================================
+0.2.4     More tools in the registry and added precommit
 0.2.3     More tools in the registry
 0.2.2     add all tools required by sequana pipelines (oct 2023)
 0.2.1     More tools added.

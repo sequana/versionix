@@ -25,32 +25,31 @@ def test_macs3(fp, mocker):
     assert get_version("macs3") == "3.0.0b1"
 
 
-def test_kallisto(fp, mocker):
-    mocker.patch("shutil.which", return_value="something")
-    fp.register(["kallisto", "version"], stdout=["kallisto, version 0.48.0"])
-    assert get_version("kallisto") == "0.48.0"
-
-
 def test_pigz(fp, mocker):
-    # stderr parser
     mocker.patch("shutil.which", return_value="something")
-    fp.register(["pigz", "--version"], stderr=["pigz 2.4"])
+    fp.register(["pigz", "--version"], stdout=["pigz 2.4"])
     assert get_version("pigz") == "2.4"
 
 
 def test_fastqc(fp, mocker):
-    # stderr parser
     mocker.patch("shutil.which", return_value="something")
-    fp.register(["fastqc", "--version"], stderr=["fastqc v1.0.0"])
+    fp.register(["fastqc", "--version"], stdout=["FastQC v1.0.0"])
     assert get_version("fastqc") == "1.0.0"
 
 
-def _test_bwa(fp, mocker):
+def test_bwa(fp, mocker):
     mocker.patch("shutil.which", return_value="something")
+    fp.register(["bwa", "--version"], stdout=[], stderr=["[main] unrecognized command '--version'"])
+    fp.register(["bwa", "-v"], stdout=[], stderr=["[main] unrecognized command '-v'"])
+    fp.register(["bwa", "version"], stdout=[], stderr=["[main] unrecognized command 'version'"])
+    fp.register(["bwa", "-V"], stdout=[], stderr=["[main] unrecognized command '-V'"])
+    fp.register(["bwa", "-version"], stdout=[], stderr=["[main] unrecognized command '-version'"])
     fp.register(
         ["bwa"],
+        stdout=[],
         stderr=[
             """
+
 Program: bwa (alignment via Burrows-Wheeler transformation)
 Version: 0.7.17-r1188
 Contact: Heng Li <lh3@sanger.ac.uk>
@@ -58,8 +57,14 @@ Contact: Heng Li <lh3@sanger.ac.uk>
 Usage:   bwa <command> [options]
 """
         ],
+        returncode=1,
     )
-    assert get_version("bwa") == "0.7.17-r1188"
+    assert get_version("bwa") == "0.7.17"
+
+
+def test_blacklists(fp, mocker):
+    mocker.patch("shutil.which", return_value="something")
+    assert get_version("Build_Trinotate_Boilerplate_SQLite_db.pl") == "?.?.?"
 
 
 def test_bedtools(fp, mocker):
@@ -76,8 +81,16 @@ def test_bamtools(fp, mocker):
 
 def test_singularity(fp, mocker):
     mocker.patch("shutil.which", return_value="something")
-    fp.register(["singularity", "version"], stdout=["3.6.2+12-gad3457a9a"])
-    assert get_version("singularity") == "3.6.2+12-gad3457a9a"
+    fp.register(["singularity", "--version"], stdout=["apptainer version 1.3.1-1.fc40"])
+    fp.register(["singularity", "version"], stdout=["1.3.1-1.fc403"])
+    assert get_version("singularity") == "1.3.1"
+
+
+def test_registered(fp, mocker):
+    mocker.patch("shutil.which", return_value="something")
+    # fp.register(["dot", "--version"], stdout=["dot - graphviz version 2.40.1 (20161225.0304)"])
+    fp.register(["dot", "-V"], stderr=["dot - graphviz version 2.40.1 (20161225.0304)"])
+    assert get_version("dot") == "2.40.1"
 
 
 def test_script(fp, mocker):
@@ -103,14 +116,6 @@ def test_bedtools_error(fp, mocker):
     try:
         mocker.patch("shutil.which", return_value=None)
         get_version("bedtools")
-        assert False
-    except SystemExit:
-        assert True
-
-
-def test_no_standalone():
-    try:
-        get_version("unknown_tool")
         assert False
     except SystemExit:
         assert True

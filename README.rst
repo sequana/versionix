@@ -40,7 +40,7 @@ Then, just type e.g::
 
     versionix  fastqc
 
-This tool uses a registry so it will work only with resgistered tools, which list can be obtained with::
+This tool uses returns the version as X.Y.Z string. most tools would work. However, a registry is available for complex cases. Registered tools can be obtained with::
 
     versionix --registered
 
@@ -67,6 +67,8 @@ Changelog
 ========= ========================================================================
 Version   Description
 ========= ========================================================================
+0.3.0     Refactor to use regular expression and registry only if needed. This
+          make versionix quite generic.
 0.2.4     More tools in the registry and added precommit
 0.2.3     More tools in the registry
 0.2.2     add all tools required by sequana pipelines (oct 2023)

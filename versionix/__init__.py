@@ -1,6 +1,17 @@
-import pkg_resources
+from importlib import metadata
 
-try:
-    version = pkg_resources.require("versionix")[0].version
-except:  # pragma: no cover
-    version = ">=0.1.0"
+
+def get_package_version(package_name):
+    try:
+        version = metadata.version(package_name)
+        return version
+    except metadata.PackageNotFoundError:  # pragma no cover
+        return f"{package_name} not found"
+
+
+version = get_package_version("versionix")
+
+
+from .logging import Logging
+
+logger = Logging("versionix", "INFO", text_color="green")

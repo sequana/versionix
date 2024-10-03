@@ -22,6 +22,7 @@
 """.. rubric:: Standalone application dedicated to Damona"""
 import sys
 
+import colorlog
 import rich_click as click
 
 from versionix import version
@@ -37,12 +38,19 @@ click.rich_click.APPEND_METAVARS_HELP = True
 click.rich_click.STYLE_ERRORS_SUGGESTION = "magenta italic"
 click.rich_click.SHOW_ARGUMENTS = True
 
+logger = colorlog.getLogger(__name__)
+
 
 @click.command()
 @click.argument("standalone", required=False, type=click.STRING, default=None)
 @click.version_option(version)
-@click.option("--stats", is_flag=True, help="Prints number of registered tools")
 @click.option("--registered", is_flag=True, help="Prints the list of registered tools")
+@click.option(
+    "--logger-level",
+    type=click.Choice(["INFO", "DEBUG", "WARNING", "ERROR"]),
+    help="level for debugging",
+    default="INFO",
+)
 def main(**kwargs):
     """Versionix returns the version of bioinformatics software.
 
@@ -56,11 +64,12 @@ def main(**kwargs):
 
 
     """
-    if kwargs["stats"]:
-        from versionix.registry import metadata
 
-        click.echo(f"There are currently {len(metadata.keys())} registered tools in Versionix")
-    elif kwargs["registered"]:
+    from versionix import logger
+
+    logger._set_level(kwargs["logger_level"])
+
+    if kwargs["registered"]:
         from versionix.registry import metadata
 
         names = sorted(metadata.keys())

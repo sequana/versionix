@@ -36,11 +36,11 @@ This is pure Python so no need for fancy libraries.
 Usage
 -----
 
-Then, just type e.g::
+Then, just type **versionix** followed by an executable installed on your system, e.g::
 
-    versionix  fastqc
+    versionix fastqc
 
-This tool uses returns the version as X.Y.Z string. most tools would work. However, a registry is available for complex cases. Registered tools can be obtained with::
+**versionix** prints the version as X.Y.Z string. Most tools would work. However, a registry is available for complex cases. Registered tools can be obtained with and if your favorite tool is not there, create a PR or an issue::
 
     versionix --registered
 
@@ -57,9 +57,10 @@ DESCRIPTION
 ===========
 
 
-The first difficulty is that standalone applications have different ways to obtain their version information. Some require the use of a long or short argument (--version or -v), while others do not require any argument at all. In addition, display channels (stdout or stderr) and formats of the version output differs between applications. To handle these various cases, we define a dictionnary of **metadata** related to the different standalones. These metadata helps in the identification of the command to run, the options to use, if the information is directed to stdout or stderr and the method to parse the output to obtain the version number.
+The first difficulty is that standalone applications have different ways to obtain their version information. Some require the use of a long or short argument (--version or -v), while others do not require any argument at all. In addition, display channels (stdout or stderr) and formats of the version output differs between applications. To handle these various cases, we define a regular expression that should work for maybe 80% of applications (difficult to estimate). For non standard case, a dictionnary of **metadata** related to the different standalones is available. These metadata helps in the identification of the command to run, the options to use, if the information is directed to stdout or stderr and the method to parse the output to obtain the version number.
 
-Versionix is designed to be used with all Sequana pipelines and is not intended to be universal. It will only work for tools that are registered. You can add your own standalone version in the versionix/register.py file and provide a Pull Request.
+Versionix is designed to be used with all Sequana pipelines and is not intended to be universal. You can add your own standalone version in the versionix/register.py file and provide a Pull Request.
+
 
 Changelog
 =========

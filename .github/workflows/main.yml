@@ -54,21 +54,15 @@ jobs:
         pip install .
         pip install pytest pytest-cov coverage coveralls pytest-subprocess pytest-mock
 
-    #run: |
-    #  bash
-    #  pip install damona
-    #  damona
-    #  echo " source ~/.config/damona/damona.sh" >> ~/.bashrc
-
     - name: testing
       run: |
         pytest --cov-report term --cov=versionix
 
     - name: coveralls
       run: |
-        coveralls --service=github-actions
+        coveralls --service=github
       env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        GITHUB_TOKEN: ${{ github.token }}
 
 
 

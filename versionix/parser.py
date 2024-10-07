@@ -87,7 +87,8 @@ def get_version(standalone, verbose=True):
 
     # let us check that the standalone exists locally
     if shutil.which(standalone) is None:
-        logger.error(f"ERROR: {standalone} command not found in your environment")
+        if verbose:
+            logger.warning(f"{standalone} command not found in your environment")
         sys.exit(1)
 
     # is it registered ?

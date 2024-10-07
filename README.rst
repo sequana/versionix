@@ -15,7 +15,7 @@ Versionix
 .. image:: https://zenodo.org/badge/658721856.svg
    :target: https://zenodo.org/badge/latestdoi/658721856
 
-:Python version: Python 3.8, 3.9, 3.10, 3.11
+:Python version: Python 3.8, 3.9, 3.10, 3.11, 3.12
 :Source: See  `http://github.com/sequana/versionix <https://github.com/sequana/versionix/>`__.
 :Issues: Please fill a report on `github <https://github.com/sequana/versionix/issues>`__
 
@@ -36,11 +36,18 @@ This is pure Python so no need for fancy libraries.
 Usage
 -----
 
-Then, just type **versionix** followed by an executable installed on your system, e.g::
+Then, just type **versionix** followed by an executable installed on your system, e.g for linux users::
+
+    versionix ls
+
+where **ls** is a standard command. In bioinformatics, **fastqc** is quite common. You can check its version as
+follows::
 
     versionix fastqc
 
-**versionix** prints the version as X.Y.Z string. Most tools would work. However, a registry is available for complex cases. Registered tools can be obtained with and if your favorite tool is not there, create a PR or an issue::
+**versionix** prints the version as X.Y.Z string.
+
+Most tools would work. However, a registry is available for complex cases. Registered tools can be obtained with the following command. If your favorite tool is not there, create a PR or an issue::
 
     versionix --registered
 
@@ -68,6 +75,7 @@ Changelog
 ========= ========================================================================
 Version   Description
 ========= ========================================================================
+0.99.0    Final version before 1.0.0
 0.3.0     Refactor to use regular expression and registry only if needed. This
           make versionix quite generic.
 0.2.4     More tools in the registry and added precommit

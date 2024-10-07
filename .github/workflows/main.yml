@@ -19,7 +19,7 @@ jobs:
     strategy:
       max-parallel: 5
       matrix:
-        python: [3.8, 3.9, '3.10', '3.11']
+        python: [3.8, 3.9, '3.10', '3.11', '3.12']
       fail-fast: false
 
     steps:
@@ -53,13 +53,6 @@ jobs:
       run: |
         pip install .
         pip install pytest pytest-cov coverage coveralls pytest-subprocess pytest-mock
-
-    - name: Install Damona using pip
-      run: |
-        bash
-        pip install damona
-        damona
-        echo " source ~/.config/damona/damona.sh" >> ~/.bashrc
 
     - name: testing
       run: |

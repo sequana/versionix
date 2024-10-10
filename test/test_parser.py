@@ -111,11 +111,29 @@ def test_script(fp, mocker):
     )
 
 
-def test_bedtools_error(fp, mocker):
+def test_DESeq2_error(fp, mocker):
     # registered tool but if not installed, should raise a SystemExit error
     try:
         mocker.patch("shutil.which", return_value=None)
-        get_version("bedtools")
+        get_version("DESeq2")
         assert False
     except SystemExit:
+        assert True
+
+
+def test_empty_parsers(fp, mocker):
+    try:
+        mocker.patch("shutil.which", return_value=True)
+        get_version("for_testing_empty_parsers")
+        assert False
+    except ValueError:
+        assert True
+
+
+def test_no_parser(fp, mocker):
+    try:
+        mocker.patch("shutil.which", return_value=True)
+        get_version("for_testing_no_parsers")
+        assert False
+    except ValueError:
         assert True

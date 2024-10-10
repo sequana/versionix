@@ -61,13 +61,13 @@ class Versionix:
                     except Exception as err:  # pragma no cover
                         pass
 
-        logger.warning(f"None of {options} looks valid for {self.standalone}")
+        logger.warning(f"None of {options} looks valid for {self.standalone}")  # pragma: no cover
         # instead of returning None, we return a string ?.?.? to mimic X.Y.Z pattern
-        return "?.?.?"
+        return "?.?.?"  # pragma: no cover
 
     def parse_version(self, string):
 
-        # valir for
+        # valid for
         #    "tools 2.5.2",
         #    "tools v1.1.0",
         #    "tools 3.0.0b1",
@@ -81,14 +81,14 @@ class Versionix:
         return version
 
 
-def get_version(standalone, verbose=True):
+def get_version(standalone, verbose=True, R=False):
     """Main entry point that returns the version of an existing executable"""
     # we should use check_output in case the standalone opens a GUI (e.g. fastqc --WRONG pops up the GUI)
 
     # let us check that the standalone exists locally
     if shutil.which(standalone) is None:
         if verbose:
-            logger.warning(f"{standalone} command not found in your environment")
+            logger.error(f"{standalone} command not found in your environment")
         sys.exit(1)
 
     # is it registered ?
@@ -108,7 +108,7 @@ def get_version(standalone, verbose=True):
 def search_registered(standalone):
 
     # Otherwise, a search using registered names
-    logger.warning(f"Using registered info for {standalone}")
+    logger.debug(f"Using registered info for {standalone}")
     meta = metadata[standalone]
 
     # The command used to get the version output
@@ -117,16 +117,23 @@ def search_registered(standalone):
     # The options necessary to get the version output
     options = meta.get("options", "")
 
-    # The parser of the version output
-    parser = meta.get("parser", lambda x: x.stdout.strip())
+    # The parser of the version output. If not provided, set to null list to raise an error
+    parsers = meta.get("parsers", [])
+
+    if len(parsers) == 0:
+        logger.error(f"parsers for {standalone} is incorrect. Must be a list of valid parsers. Check the registry.py")
+        raise ValueError(f"parsers for {standalone} is incorrect. Must be a list of valid parsers")
 
     try:
         cmd = f"{caller} {options}"
-
         p = subprocess.run(cmd, capture_output=True, universal_newlines=True, shell=True)
-        version = parser(p)
-        return version
-
+        for parser in parsers:
+            try:
+                version = parser(p)
+                return version
+            except Exception as err:  # pragma: no cover
+                pass
+        raise Exception("No parsers could parse the version effectively")  # pragma: no cover
     except Exception as err:  # pragma: no cover
         print(err)
         sys.exit(1)

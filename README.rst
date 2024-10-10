@@ -75,6 +75,7 @@ Changelog
 ========= ========================================================================
 Version   Description
 ========= ========================================================================
+0.99.1    Remove warning if we are using registered entry.
 0.99.0    Final version before 1.0.0
 0.3.0     Refactor to use regular expression and registry only if needed. This
           make versionix quite generic.

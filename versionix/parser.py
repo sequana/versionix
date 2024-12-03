@@ -47,9 +47,15 @@ class Versionix:
             if p.returncode == 0:
                 logger.debug(f"return code 0 for {option}")
                 stdout = p.stdout.strip()
+                stderr = p.stderr.strip()
                 if stdout:
                     try:
                         return self.parse_version(stdout)
+                    except Exception as err:  # pragma: no cover
+                        pass
+                elif stderr:  # sometimes the output is on stderr
+                    try:
+                        return self.parse_version(stderr)
                     except Exception as err:  # pragma: no cover
                         pass
             else:
@@ -86,7 +92,12 @@ def get_version(standalone, verbose=True, R=False):
     # we should use check_output in case the standalone opens a GUI (e.g. fastqc --WRONG pops up the GUI)
 
     # let us check that the standalone exists locally
-    if shutil.which(standalone) is None:
+    # versionix should handle special cases of standlones to be found in containers
+    if (
+        standalone.startswith("singularity") or standalone.startswith("apptainer") or standalone.startswith("docker")
+    ):  # pragma: no cover
+        pass
+    elif shutil.which(standalone) is None:
         if verbose:
             logger.error(f"{standalone} command not found in your environment")
         sys.exit(1)

@@ -22,7 +22,9 @@ Versionix
 Overview
 ========
 
-Versionix is a simple tool that attemps to print on screen the version of a given standalone.
+Versionix is a lightweight tool designed to display the version of standalone software directly on the screen, handling
+various versioning formats.
+
 
 Installation
 ----------------
@@ -59,6 +61,14 @@ to get more help like this example:
 
 .. image:: doc/versionix_usage.png
 
+For developers only
+-------------------
+
+Contributions are welcome. Please submit pull requests. If you do so, please also add or update tests if needed.
+
+We use pytest, that can be used as follow in the root of the project:
+
+    pytest -v --cov versionix
 
 DESCRIPTION
 ===========
@@ -75,6 +85,8 @@ Changelog
 ========= ========================================================================
 Version   Description
 ========= ========================================================================
+0.99.2    Handle cases where e.g. --version is returned to the stderr (instead of
+          stdout)
 0.99.1    Remove warning if we are using registered entry.
 0.99.0    Final version before 1.0.0
 0.3.0     Refactor to use regular expression and registry only if needed. This

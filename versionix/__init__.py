@@ -15,3 +15,5 @@ version = get_package_version("versionix")
 from .logging import Logging
 
 logger = Logging("versionix", "INFO", text_color="green")
+
+from versionix.parser import get_version

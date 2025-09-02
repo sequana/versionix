@@ -38,6 +38,8 @@ metadata = {
     },
     # actually installed as quast.py but sometimes, may be called quast
     "quast": {"options": "", "parsers": [lambda x: x.stderr.split("\n")[1].split()[1]]},
+    #
+    "ragtag_scaffold.py": {"caller": "ragtag.py --version", "parsers": [lambda x: x.stdout.split("\n")[0][1:]]},
     # "syri": {
     #    "options": "--version",
     #    # "parser": parser_split_2

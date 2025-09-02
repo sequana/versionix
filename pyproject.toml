@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "versionix"
-version = "0.99.2"
+version = "0.99.3"
 description = "Get version of any tools"
 authors = ["Sequana Team"]
 license = "BSD-3"

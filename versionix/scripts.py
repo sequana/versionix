@@ -51,6 +51,13 @@ logger = colorlog.getLogger(__name__)
     help="level for debugging",
     default="INFO",
 )
+@click.option(
+    "--from",
+    "from_container",
+    default=None,
+    type=click.STRING,
+    help="Container image to introspect (e.g., a Singularity/Apptainer .img/.sif file or a Docker image name)",
+)
 def main(**kwargs):
     """Versionix returns the version of bioinformatics software.
 
@@ -62,6 +69,9 @@ def main(**kwargs):
 
         versionix --registered
 
+    You can retrieve the version of a tool from inside a container
+
+        versionix sequana_coverage --from sequana_0.18.img
 
     """
 
@@ -95,4 +105,4 @@ def main(**kwargs):
             )
             sys.exit(0)
         else:
-            click.echo(get_version(kwargs["standalone"]))
+            click.echo(get_version(kwargs["standalone"], container=kwargs["from_container"]))

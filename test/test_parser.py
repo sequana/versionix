@@ -137,3 +137,86 @@ def test_no_parser(fp, mocker):
         assert False
     except ValueError:
         assert True
+
+
+def test_from_singularity_img(fp, mocker):
+    # shutil.which returns "singularity" when asked for singularity/apptainer runners
+    def which_side_effect(cmd):
+        if cmd == "apptainer":
+            return None
+        if cmd == "singularity":
+            return "/usr/bin/singularity"
+        return None
+
+    mocker.patch("versionix.parser.shutil.which", side_effect=which_side_effect)
+    fp.register(
+        ["singularity", "exec", "sequana_0.18.img", "sequana_coverage", "--version"],
+        stdout=["sequana_coverage, version 0.15.4"],
+    )
+    assert get_version("sequana_coverage", container="sequana_0.18.img") == "0.15.4"
+
+
+def test_from_apptainer_sif(fp, mocker):
+    def which_side_effect(cmd):
+        if cmd == "apptainer":
+            return "/usr/bin/apptainer"
+        return None
+
+    mocker.patch("versionix.parser.shutil.which", side_effect=which_side_effect)
+    fp.register(
+        ["apptainer", "exec", "myimage.sif", "fastqc", "--version"],
+        stdout=["FastQC v0.12.0"],
+    )
+    assert get_version("fastqc", container="myimage.sif") == "0.12.0"
+
+
+def test_from_docker_image(fp, mocker):
+    def which_side_effect(cmd):
+        if cmd == "docker":
+            return "/usr/bin/docker"
+        return None
+
+    mocker.patch("versionix.parser.shutil.which", side_effect=which_side_effect)
+    mocker.patch("versionix.parser.os.path.isfile", return_value=False)
+    fp.register(
+        ["docker", "run", "--rm", "myimage:latest", "fastqc", "--version"],
+        stdout=["FastQC v0.12.0"],
+    )
+    assert get_version("fastqc", container="myimage:latest") == "0.12.0"
+
+
+def test_from_registered_tool_with_container(fp, mocker):
+    def which_side_effect(cmd):
+        if cmd == "apptainer":
+            return None
+        if cmd == "singularity":
+            return "/usr/bin/singularity"
+        return None
+
+    mocker.patch("versionix.parser.shutil.which", side_effect=which_side_effect)
+    fp.register(
+        ["singularity", "exec", "sequana_0.18.img", "dot", "-V"],
+        stderr=["dot - graphviz version 2.40.1 (20161225.0304)"],
+    )
+    assert get_version("dot", container="sequana_0.18.img") == "2.40.1"
+
+
+def test_script_from_container(fp, mocker):
+    from click.testing import CliRunner
+
+    def which_side_effect(cmd):
+        if cmd == "apptainer":
+            return None
+        if cmd == "singularity":
+            return "/usr/bin/singularity"
+        return None
+
+    mocker.patch("versionix.parser.shutil.which", side_effect=which_side_effect)
+    fp.register(
+        ["singularity", "exec", "sequana_0.18.img", "sequana_coverage", "--version"],
+        stdout=["sequana_coverage, version 0.15.4"],
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(main, ["sequana_coverage", "--from", "sequana_0.18.img"])
+    assert "0.15.4" in result.output

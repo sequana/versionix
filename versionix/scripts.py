@@ -1,25 +1,15 @@
-###########################################################################
-# Versionix is a project to manage reproducible containers                #
-#                                                                         #
-# Authors: see CONTRIBUTORS.rst                                           #
-# Copyright © 2023 Sequana dev team                                       #
-# See the COPYRIGHT file for details                                      #
-#                                                                         #
-# Versionix is free software: you can redistribute it and/or modify       #
-# it under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or       #
-# (at your option) any later version.                                     #
-#                                                                         #
-# Versionix  is distributed in the hope that it will be useful,           #
-# but WITHOUT ANY WARRANTY; without even the implied warranty of          #
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           #
-# GNU General Public License for more details.                            #
-#                                                                         #
-# You should have received a copy of the GNU General Public License       #
-# along with this program (COPYING file).                                 #
-# If not, see <http://www.gnu.org/licenses/>.                             #
-###########################################################################
-""".. rubric:: Standalone application dedicated to Damona"""
+#
+#  This file is part of Versionix software
+#
+#  Copyright (c) 2023 - Sequana Dev Team (https://sequana.readthedocs.io)
+#
+#  Distributed under the terms of the 3-clause BSD license.
+#  The full license is in the LICENSE file, distributed with this software.
+#
+#  Website:       https://github.com/sequana/versionix
+#  Contributors:  https://github.com/sequana/versionix/graphs/contributors
+##############################################################################
+""".. rubric:: Standalone application (CLI entry point) for Versionix"""
 import sys
 
 import colorlog
@@ -32,9 +22,7 @@ __all__ = ["main"]
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
-click.rich_click.USE_MARKDOWN = True
-click.rich_click.SHOW_METAVARS_COLUMN = True
-click.rich_click.APPEND_METAVARS_HELP = True
+click.rich_click.TEXT_MARKUP = "markdown"
 click.rich_click.STYLE_ERRORS_SUGGESTION = "magenta italic"
 click.rich_click.SHOW_ARGUMENTS = True
 

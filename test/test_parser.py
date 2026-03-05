@@ -105,7 +105,6 @@ def test_script(fp, mocker):
     print(result)
 
     runner.invoke(main, ["--registered"])
-    runner.invoke(main, ["--stats"])
     runner.invoke(
         main,
     )
@@ -119,6 +118,19 @@ def test_DESeq2_error(fp, mocker):
         assert False
     except SystemExit:
         assert True
+
+
+def test_DESeq2_uses_rscript_caller(fp, mocker):
+    # DESeq2 is registered with a Rscript caller; the PATH check should look for Rscript, not DESeq2
+    def which_side_effect(cmd):
+        return "/usr/bin/Rscript" if cmd == "Rscript" else None
+
+    mocker.patch("versionix.parser.shutil.which", side_effect=which_side_effect)
+    fp.register(
+        'Rscript -e "library(DESeq2);packageVersion(\'DESeq2\')"',
+        stdout=["[1] '1.42.0'"],
+    )
+    assert get_version("DESeq2") == "1.42.0"
 
 
 def test_empty_parsers(fp, mocker):

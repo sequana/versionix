@@ -9,9 +9,6 @@ Versionix
     :target: https://pypi.python.org/pypi/versionix
     :alt: Supported Python versions
 
-.. image:: https://img.shields.io/pypi/dm/versionix
-    :target: https://pypi.python.org/pypi/versionix
-    :alt: Monthly PyPI downloads
 
 .. image:: https://github.com/sequana/versionix/actions/workflows/main.yml/badge.svg
    :target: https://github.com/sequana/versionix/actions/workflows/main.yml
@@ -25,9 +22,6 @@ Versionix
     :target: https://github.com/sequana/versionix/blob/main/LICENSE
     :alt: License
 
-.. image:: https://zenodo.org/badge/658721856.svg
-   :target: https://zenodo.org/badge/latestdoi/658721856
-   :alt: Zenodo DOI
 
 ----
 
@@ -151,6 +145,7 @@ Changelog
 ========= ========================================================================
 Version   Description
 ========= ========================================================================
+0.99.4    allow introspection of apptainers
 0.99.3    Maintenance release
 0.99.2    Handle cases where e.g. --version is returned to the stderr (instead of
           stdout)

@@ -9,7 +9,9 @@
 #  Website:       https://github.com/sequana/versionix
 #  Contributors:  https://github.com/sequana/versionix/graphs/contributors
 ##############################################################################
+import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -26,9 +28,10 @@ from .registry import metadata
 
 
 class Versionix:
-    def __init__(self, standalone):
+    def __init__(self, standalone, container_runner=None):
 
         self.standalone = standalone
+        self.container_runner = container_runner
 
     def get_version(self):
         """possibilities"""
@@ -41,7 +44,11 @@ class Versionix:
 
         options = ["--version", "-v", "version", "-V", "-version", ""]
         for option in options:
-            cmd = f"{self.standalone} {option}".strip()
+            tool_cmd = f"{self.standalone} {option}".strip()
+            if self.container_runner:
+                cmd = f"{self.container_runner} {tool_cmd}"
+            else:
+                cmd = tool_cmd
             logger.debug(cmd)
             p = subprocess.run(cmd, capture_output=True, universal_newlines=True, shell=True)
             if p.returncode == 0:
@@ -87,13 +94,44 @@ class Versionix:
         return version
 
 
-def get_version(standalone, verbose=True, R=False):
+def _get_container_runner(container):
+    """Return the exec command prefix for a container image.
+
+    Supports Singularity/Apptainer image files (.img, .sif) and Docker images.
+    """
+    # .img and .sif are known Singularity/Apptainer image file extensions;
+    # also treat any existing local file as a Singularity/Apptainer image.
+    is_singularity_image = container.endswith(".img") or container.endswith(".sif") or os.path.isfile(container)
+    if is_singularity_image:
+        quoted = shlex.quote(container)
+        if shutil.which("apptainer"):
+            return f"apptainer exec {quoted}"
+        elif shutil.which("singularity"):
+            return f"singularity exec {quoted}"
+        else:
+            logger.error("Neither apptainer nor singularity found in PATH")
+            sys.exit(1)
+    else:
+        # Assume a Docker image (name[:tag] or registry/name[:tag])
+        image = container.removeprefix("docker://")
+        quoted_image = shlex.quote(image)
+        if shutil.which("docker"):
+            return f"docker run --rm {quoted_image}"
+        else:
+            logger.error("docker not found in PATH")
+            sys.exit(1)
+
+
+def get_version(standalone, verbose=True, R=False, container=None):
     """Main entry point that returns the version of an existing executable"""
     # we should use check_output in case the standalone opens a GUI (e.g. fastqc --WRONG pops up the GUI)
 
+    container_runner = None
+    if container is not None:
+        container_runner = _get_container_runner(container)
     # let us check that the standalone exists locally
     # versionix should handle special cases of standlones to be found in containers
-    if (
+    elif (
         standalone.startswith("singularity") or standalone.startswith("apptainer") or standalone.startswith("docker")
     ):  # pragma: no cover
         pass
@@ -104,19 +142,19 @@ def get_version(standalone, verbose=True, R=False):
 
     # is it registered ?
     if standalone in metadata.keys():
-        version = search_registered(standalone)
+        version = search_registered(standalone, container_runner=container_runner)
         return version
 
     # Try a generic search
     try:
-        v = Versionix(standalone)
+        v = Versionix(standalone, container_runner=container_runner)
         return v.get_version()
     except Exception as err:  # pragma: no cover
         print(err)
         sys.exit(1)
 
 
-def search_registered(standalone):
+def search_registered(standalone, container_runner=None):
 
     # Otherwise, a search using registered names
     logger.debug(f"Using registered info for {standalone}")
@@ -137,6 +175,8 @@ def search_registered(standalone):
 
     try:
         cmd = f"{caller} {options}"
+        if container_runner:
+            cmd = f"{container_runner} {cmd}"
         p = subprocess.run(cmd, capture_output=True, universal_newlines=True, shell=True)
         for parser in parsers:
             try:

@@ -1,6 +1,9 @@
 Versionix
 ###########
 
+.. image:: doc/logo.png
+   :alt: Versionix logo
+
 .. image:: https://badge.fury.io/py/versionix.svg
     :target: https://pypi.python.org/pypi/versionix
     :alt: Latest PyPI version

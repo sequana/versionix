@@ -77,9 +77,22 @@ def main(**kwargs):
             click.echo(f"{name}")
     else:
         if kwargs["standalone"] is None:
-            click.echo(
-                "No standalone was provided. You must provide one. You can use --registered to see the current list'"
+            from rich.panel import Panel
+            from rich.console import Console
+
+            console = Console()
+            console.print(
+                Panel(
+                    f"[bold blue]versionix[/bold blue] [cyan]v{version}[/cyan]\n\n"
+                    "[white]Authors: Sequana Team[/white]\n"
+                    "[white]Repository: https://github.com/sequana/versionix[/white]\n\n"
+                    "[italic]Get the version of any bioinformatics tool.[/italic]\n\n"
+                    "[yellow]Usage:[/yellow] versionix <standalone>\n"
+                    "[yellow]Help:[/yellow]  versionix --help",
+                    title="[bold]Versionix[/bold]",
+                    expand=False,
+                )
             )
-            sys.exit(1)
+            sys.exit(0)
         else:
             click.echo(get_version(kwargs["standalone"]))

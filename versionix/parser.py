@@ -122,7 +122,7 @@ def _get_container_runner(container):
             sys.exit(1)
 
 
-def get_version(standalone, verbose=True, R=False, container=None):
+def get_version(standalone, verbose=True, container=None):
     """Main entry point that returns the version of an existing executable"""
     # we should use check_output in case the standalone opens a GUI (e.g. fastqc --WRONG pops up the GUI)
 
@@ -135,10 +135,18 @@ def get_version(standalone, verbose=True, R=False, container=None):
         standalone.startswith("singularity") or standalone.startswith("apptainer") or standalone.startswith("docker")
     ):  # pragma: no cover
         pass
-    elif shutil.which(standalone) is None:
-        if verbose:
-            logger.error(f"{standalone} command not found in your environment")
-        sys.exit(1)
+    else:
+        # For registered tools with a custom caller, check the caller binary rather than
+        # the standalone name (e.g. DESeq2 is invoked via `Rscript`, not a `DESeq2` binary).
+        if standalone in metadata:
+            caller = metadata[standalone].get("caller", standalone)
+            check_cmd = shlex.split(caller)[0]
+        else:
+            check_cmd = standalone
+        if shutil.which(check_cmd) is None:
+            if verbose:
+                logger.error(f"{check_cmd} command not found in your environment")
+            sys.exit(1)
 
     # is it registered ?
     if standalone in metadata.keys():
@@ -174,7 +182,7 @@ def search_registered(standalone, container_runner=None):
         raise ValueError(f"parsers for {standalone} is incorrect. Must be a list of valid parsers")
 
     try:
-        cmd = f"{caller} {options}"
+        cmd = f"{caller} {options}".strip()
         if container_runner:
             cmd = f"{container_runner} {cmd}"
         p = subprocess.run(cmd, capture_output=True, universal_newlines=True, shell=True)

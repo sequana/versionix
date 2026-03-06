@@ -18,7 +18,7 @@ metadata = {
     "circlator": {"options": "version", "parsers": [lambda x: x.stdout.strip()]},
     "DESeq2": {
         "caller": "Rscript -e \"library(DESeq2);packageVersion('DESeq2')\"",
-        "parsers": [lambda x: x.stdout.split()[1].strip("’‘")],
+        "parsers": [lambda x: x.stdout.split()[1].strip("'")],
     },
     # dot -v hangs so we need to register this command.
     "dot": {"options": "-V", "parsers": [lambda x: x.stderr.split()[4].strip()]},
@@ -45,8 +45,4 @@ metadata = {
     #    # "parser": parser_split_2
     # },
     # "vt": {"options": "--version", "parser": parser_split_2_strip_v},
-    "for_testing_empty_parsers": {"options": "", "parsers": []},
-    "for_testing_no_parsers": {
-        "options": "",
-    },
 }

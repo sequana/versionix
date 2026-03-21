@@ -111,7 +111,7 @@ def _get_container_runner(container):
             sys.exit(1)
     else:
         # Assume a Docker image (name[:tag] or registry/name[:tag])
-        image = container.removeprefix("docker://")
+        image = container[len("docker://"):] if container.startswith("docker://") else container
         quoted_image = shlex.quote(image)
         if shutil.which("docker"):
             return f"docker run --rm {quoted_image}"

@@ -173,8 +173,7 @@ Changelog
 ========= ========================================================================
 Version   Description
 ========= ========================================================================
-0.99.5    Update doc
-0.99.4    allow introspection of apptainers
+0.99.4    allow introspection of apptainers, cleanup, more tests
 0.99.3    Maintenance release
 0.99.2    Handle cases where e.g. --version is returned to the stderr (instead of
           stdout)

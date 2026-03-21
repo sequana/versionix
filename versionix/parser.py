@@ -18,9 +18,7 @@ import sys
 
 import colorlog
 
-from versionix import logger
-
-logger = colorlog.getLogger(logger.name)
+logger = colorlog.getLogger("versionix")
 
 
 from .blacklist import blacklist
@@ -149,7 +147,7 @@ def get_version(standalone, verbose=True, container=None):
             sys.exit(1)
 
     # is it registered ?
-    if standalone in metadata.keys():
+    if standalone in metadata:
         version = search_registered(standalone, container_runner=container_runner)
         return version
 

@@ -21,6 +21,10 @@ Versionix
     :target: https://coveralls.io/github/sequana/versionix?branch=main
     :alt: Coverage
 
+.. image:: https://app.codacy.com/project/badge/Grade/7828229d14404f02b14eae651f8a5b20
+    :target: https://app.codacy.com/gh/cokelaer/versionix/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade
+    :alt: Codacy grade
+
 .. image:: https://img.shields.io/badge/license-BSD--3--Clause-blue.svg
     :target: https://github.com/sequana/versionix/blob/main/LICENSE
     :alt: License
@@ -62,6 +66,7 @@ Key features
 - 🐍 **Pure Python** — no compiled dependencies; works on any platform
 - ⚡ **Fast** — single subprocess call, minimal overhead
 - 🔗 **Library API** — importable ``get_version()`` function for use in your own code
+- 📦 **Container support** — introspect versions from local Singularity/Apptainer image files
 
 Installation
 ============
@@ -98,15 +103,35 @@ Full help::
 .. image:: doc/versionix_usage.png
    :alt: versionix --help output
 
+Container introspection
+-----------------------
+
+You can retrieve the version of a tool that is packaged inside a local
+Singularity/Apptainer image file (``.img`` or ``.sif``) using the ``--from``
+option::
+
+    versionix sniffles --from sniffles_2.7.3.img
+    versionix fastqc --from fastqc.sif
+
+If ``apptainer`` is available it is preferred over ``singularity``; both are
+tried automatically.
+
 Python API
 ----------
 
 You can also call ``get_version`` directly from Python::
 
-    from versionix.parser import get_version
+    from versionix import get_version
 
     version = get_version("fastqc")
     print(version)  # e.g. "0.11.9"
+
+Pass a ``container`` argument to introspect a tool inside a local image file::
+
+    from versionix import get_version
+
+    version = get_version("sniffles", container="sniffles_2.7.3.img")
+
 
 How it works
 ============
@@ -148,6 +173,7 @@ Changelog
 ========= ========================================================================
 Version   Description
 ========= ========================================================================
+0.99.5    Update doc
 0.99.4    allow introspection of apptainers
 0.99.3    Maintenance release
 0.99.2    Handle cases where e.g. --version is returned to the stderr (instead of

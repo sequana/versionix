@@ -12,7 +12,6 @@
 """.. rubric:: Standalone application (CLI entry point) for Versionix"""
 import sys
 
-import colorlog
 import rich_click as click
 
 from versionix import version
@@ -25,8 +24,6 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 click.rich_click.TEXT_MARKUP = "markdown"
 click.rich_click.STYLE_ERRORS_SUGGESTION = "magenta italic"
 click.rich_click.SHOW_ARGUMENTS = True
-
-logger = colorlog.getLogger(__name__)
 
 
 @click.command()
@@ -75,8 +72,8 @@ def main(**kwargs):
             click.echo(f"{name}")
     else:
         if kwargs["standalone"] is None:
-            from rich.panel import Panel
             from rich.console import Console
+            from rich.panel import Panel
 
             console = Console()
             console.print(

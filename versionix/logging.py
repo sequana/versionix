@@ -1,15 +1,13 @@
-# -*- python -*-
 #
-#  This file is part of easydev software
+#  This file is part of Versionix software
 #
-#  Copyright (c) 2011-2024
+#  Copyright (c) 2023 - Sequana Dev Team (https://sequana.readthedocs.io)
 #
-#  File author(s): Thomas Cokelaer <cokelaer@gmail.com>
+#  Distributed under the terms of the 3-clause BSD license.
+#  The full license is in the LICENSE file, distributed with this software.
 #
-#  Distributed under the BSD3 License.
-#
-#  Website: https://github.com/cokelaer/easydev
-#
+#  Website:       https://github.com/sequana/versionix
+#  Contributors:  https://github.com/sequana/versionix/graphs/contributors
 ##############################################################################
 # import logging
 import colorlog

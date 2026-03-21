@@ -1,6 +1,8 @@
 import sys
 
-from versionix.parser import get_version as get_version
+import pytest
+
+from versionix.parser import get_version
 from versionix.scripts import main
 
 # for testing we do not want to install all those tools/software so
@@ -112,12 +114,9 @@ def test_script(fp, mocker):
 
 def test_DESeq2_error(fp, mocker):
     # registered tool but if not installed, should raise a SystemExit error
-    try:
-        mocker.patch("shutil.which", return_value=None)
+    mocker.patch("shutil.which", return_value=None)
+    with pytest.raises(SystemExit):
         get_version("DESeq2")
-        assert False
-    except SystemExit:
-        assert True
 
 
 def test_DESeq2_uses_rscript_caller(fp, mocker):
@@ -127,28 +126,22 @@ def test_DESeq2_uses_rscript_caller(fp, mocker):
 
     mocker.patch("versionix.parser.shutil.which", side_effect=which_side_effect)
     fp.register(
-        'Rscript -e "library(DESeq2);packageVersion(\'DESeq2\')"',
+        "Rscript -e \"library(DESeq2);packageVersion('DESeq2')\"",
         stdout=["[1] '1.42.0'"],
     )
     assert get_version("DESeq2") == "1.42.0"
 
 
 def test_empty_parsers(fp, mocker):
-    try:
-        mocker.patch("shutil.which", return_value=True)
+    mocker.patch("shutil.which", return_value=True)
+    with pytest.raises(ValueError):
         get_version("for_testing_empty_parsers")
-        assert False
-    except ValueError:
-        assert True
 
 
 def test_no_parser(fp, mocker):
-    try:
-        mocker.patch("shutil.which", return_value=True)
+    mocker.patch("shutil.which", return_value=True)
+    with pytest.raises(ValueError):
         get_version("for_testing_no_parsers")
-        assert False
-    except ValueError:
-        assert True
 
 
 def test_from_singularity_img(fp, mocker):
@@ -211,6 +204,20 @@ def test_from_registered_tool_with_container(fp, mocker):
         stderr=["dot - graphviz version 2.40.1 (20161225.0304)"],
     )
     assert get_version("dot", container="sequana_0.18.img") == "2.40.1"
+
+
+def test_no_singularity_or_apptainer_in_path(fp, mocker):
+    mocker.patch("versionix.parser.shutil.which", return_value=None)
+    mocker.patch("versionix.parser.os.path.isfile", return_value=False)
+    with pytest.raises(SystemExit):
+        get_version("fastqc", container="myimage.sif")
+
+
+def test_no_docker_in_path(fp, mocker):
+    mocker.patch("versionix.parser.shutil.which", return_value=None)
+    mocker.patch("versionix.parser.os.path.isfile", return_value=False)
+    with pytest.raises(SystemExit):
+        get_version("fastqc", container="myimage:latest")
 
 
 def test_script_from_container(fp, mocker):

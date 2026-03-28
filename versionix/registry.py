@@ -14,6 +14,21 @@ import re
 metadata = {
     # special -h option, and prints version within the help message
     "aragorn": {"options": "-h", "parsers": [lambda x: x.stdout.split("\n")[1].split()[1].strip("v")]},
+    # no-arg invocation prints "Program: bwa ...\nVersion: X.Y.Z-..." to stderr; --version emits a warning
+    "bwa": {
+        "options": "",
+        "parsers": [
+            lambda x: re.search(r"Version:\s*(\S+)", x.stderr).group(1).split("-")[0],
+        ],
+    },
+    # no-arg invocation prints "/ KronaTools X.Y.Z - ktImportText \" to stderr
+    "ktImportText": {
+        "options": "",
+        "parsers": [
+            lambda x: re.search(r"KronaTools\s+([\d.]+)", x.stderr).group(1),
+            lambda x: re.search(r"KronaTools\s+([\d.]+)", x.stdout).group(1),
+        ],
+    },
     "art_illumina": {"options": "", "parsers": [lambda x: re.search(r"Q Version (\d+\.\d+\.\d+)", x.stdout).group(1)]},
     "circlator": {"options": "version", "parsers": [lambda x: x.stdout.strip()]},
     "DESeq2": {

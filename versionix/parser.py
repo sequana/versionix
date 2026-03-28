@@ -13,6 +13,7 @@ import os
 import re
 import shlex
 import shutil
+import signal
 import subprocess
 import sys
 
@@ -23,6 +24,32 @@ logger = colorlog.getLogger("versionix")
 
 from .blacklist import blacklist
 from .registry import metadata
+
+
+def _run(cmd, timeout=10):
+    """Run a shell command with a hard timeout that kills the entire process group.
+
+    With shell=True, a plain subprocess.run timeout only kills the shell but
+    orphans grandchildren (e.g. singularity exec), leaving pipes open and
+    causing communicate() to hang.  Using start_new_session=True puts the
+    whole tree in its own process group so SIGTERM reaches every child.
+    Returns a CompletedProcess-like namespace, or raises subprocess.TimeoutExpired.
+    """
+    proc = subprocess.Popen(
+        cmd,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
+        start_new_session=True,
+    )
+    try:
+        stdout, stderr = proc.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+        proc.communicate()
+        raise
+    return subprocess.CompletedProcess(cmd, proc.returncode, stdout, stderr)
 
 
 class Versionix:
@@ -40,7 +67,7 @@ class Versionix:
             logger.debug(f"{self.standalone} blacklisted")
             return "?.?.?"
 
-        options = ["--version", "-v", "version", "-V", "-version", ""]
+        options = ["--version", "-v", "version", "-V", "-version", "-h", "--help", ""]
         for option in options:
             tool_cmd = f"{self.standalone} {option}".strip()
             if self.container_runner:
@@ -48,7 +75,11 @@ class Versionix:
             else:
                 cmd = tool_cmd
             logger.debug(cmd)
-            p = subprocess.run(cmd, capture_output=True, universal_newlines=True, shell=True)
+            try:
+                p = _run(cmd)
+            except subprocess.TimeoutExpired:
+                logger.warning(f"Timeout for {self.standalone} with option '{option}'")
+                continue
             if p.returncode == 0:
                 logger.debug(f"return code 0 for {option}")
                 stdout = p.stdout.strip()
@@ -65,12 +96,14 @@ class Versionix:
                         pass
             else:
                 logger.debug(f"return code {p.returncode} for {option}")
+                stdout = p.stdout.strip()
                 stderr = p.stderr.strip()
-                if stderr:
-                    try:
-                        return self.parse_version(stderr)
-                    except Exception as err:  # pragma no cover
-                        pass
+                for output in (stdout, stderr):
+                    if output:
+                        try:
+                            return self.parse_version(output)
+                        except Exception:
+                            pass
 
         logger.warning(f"None of {options} looks valid for {self.standalone}")  # pragma: no cover
         # instead of returning None, we return a string ?.?.? to mimic X.Y.Z pattern
@@ -183,7 +216,11 @@ def search_registered(standalone, container_runner=None):
         cmd = f"{caller} {options}".strip()
         if container_runner:
             cmd = f"{container_runner} {cmd}"
-        p = subprocess.run(cmd, capture_output=True, universal_newlines=True, shell=True)
+        try:
+            p = _run(cmd)
+        except subprocess.TimeoutExpired:
+            logger.warning(f"Timeout when getting version for {standalone}")
+            return "?.?.?"
         for parser in parsers:
             try:
                 version = parser(p)
